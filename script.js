@@ -21,6 +21,9 @@ class Map {
   addClickHandler(handler) {
     document.addEventListener("click", handler)
   }
+  removeClickHander(handler) {
+    document.removeEventListener("click", handler)
+  }
   clear() {
     this.context.clearRect(0, 0,  this.context.canvas.width,  this.context.canvas.height);
   }
@@ -194,7 +197,7 @@ function random_map(size) {
   return [tiles, tiles_status]
 }
 
-let size = [15,15]
+let size = [15,15];
 
 let map_canvas = new Map([660,660], "map", 20, 0);
 let map = random_map(size);
@@ -202,6 +205,7 @@ let tiles = map[0];
 let status = map[1];
 tiles = numberify(tiles);
 let shapes = map_canvas.create_map(tiles);
+let previous_shape;
 
 function reveal(coords, tiles, s) {
   function array_in_array(parent, search) {
@@ -404,9 +408,6 @@ function calculateCenter(x_column, y_row) {
 function checkForWin(shapes, size) {
   for (y=0; y < size[1]; y++) {
     for (x=0; x < size[0]; x++) {
-      console.log(shapes[String(x)+","+String(y)])
-      console.log(x, y)
-      console.log(status[y][x])
       if (status[y][x] == "unrev" && shapes[String(x)+","+String(y)][1] != "mine") {
         return false
       }
@@ -415,8 +416,27 @@ function checkForWin(shapes, size) {
   return true
 }
 
+function firstClick(event) {
+  //while (true) {
+  for (j=0; j < 10; j++) {
+    console.log('a', shapes)
+    for (i=0; i < Object.keys(shapes).length; i++) {
+      if (map_canvas.point_in_shape([event.clientX, event.clientY], shapes[Object.keys(shapes)[i]][0])) {
+        if (shapes[Object.keys(shapes)[i]][1] == "0") {
+          clickHandler(event);
+          map_canvas.removeClickHander(firstClick);
+          map_canvas.addClickHandler(clickHandler);
+          return
+        } else {
+          regen()
+          break
+        }
+      }
+    }
+  }
+}
+
 function clickHandler(event) {
-  console.log('click')
   for (i=0; i < Object.keys(shapes).length; i++) {
     if (map_canvas.point_in_shape([event.clientX, event.clientY], shapes[Object.keys(shapes)[i]][0])) {
       //0 tile path, 1 number/mine
@@ -443,9 +463,14 @@ function clickHandler(event) {
   }
 }
 
-map_canvas.addClickHandler(clickHandler)
+map_canvas.addClickHandler(firstClick)
 
-function regen(land) {
+function regen() {
+  previous_shape = shapes;
   map_canvas.clear();
-  shapes = map_canvas.create_map(numberify(random_map(size)));
+  map = random_map(size);
+  tiles = map[0];
+  status = map[1];
+  tiles = numberify(tiles);
+  shapes = map_canvas.create_map(tiles);
 }
