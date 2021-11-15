@@ -419,7 +419,6 @@ function checkForWin(shapes, size) {
 function firstClick(event) {
   //while (true) {
   for (j=0; j < 10; j++) {
-    console.log('a', shapes)
     for (i=0; i < Object.keys(shapes).length; i++) {
       if (map_canvas.point_in_shape([event.clientX, event.clientY], shapes[Object.keys(shapes)[i]][0])) {
         if (shapes[Object.keys(shapes)[i]][1] == "0") {
