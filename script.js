@@ -1,3 +1,5 @@
+let start = new Date().getTime();
+
 class Map {
   constructor(size, name, tile_size, z, parent_id=undefined) {
     let canvas = document.createElement("CANVAS")
@@ -455,7 +457,7 @@ function clickHandler(event) {
         reveal(coords, tiles, shapes);
       }
       if (checkForWin(shapes, size)) {
-        alert("You won")
+        alert("You won in "+String((new Date().getTime()-start)/1000)+"seconds")
       }
       return
     }
